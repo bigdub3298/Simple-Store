@@ -10,7 +10,7 @@ const app = express();
 // Set up pug as view engine
 app.set("view engine", "pug");
 // tell express where to find template files
-app.set("views", "views/pug");
+app.set("views", path.join(__dirname, "views", "pug"));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));

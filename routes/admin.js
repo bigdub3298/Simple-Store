@@ -11,7 +11,7 @@ router.get("/add-product", (req, res) => {
 });
 
 router.post("/add-product", (req, res) => {
-  products.push({ title: req.body });
+  products.push({ title: req.body.title });
   res.redirect("/");
 });
 
