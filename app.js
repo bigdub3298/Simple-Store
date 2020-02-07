@@ -19,7 +19,8 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, "views", "not-found.html"));
+  // res.status(404).sendFile(path.join(__dirname, "views", "not-found.html"));
+  res.status(404).render("not-found", { docTitle: "Not Found" });
 });
 
 app.listen(3000);
