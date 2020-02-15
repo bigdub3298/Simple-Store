@@ -9,10 +9,11 @@ router.get("/", (req, res) => {
   // console.log(products);
   // res.sendFile(path.join(rootDirectory, "views", "store.html"));
   res.render("store", {
-    layout: false,
     products,
     docTitle: "Store",
-    hasProducts: products.length > 0
+    hasProducts: products.length > 0,
+    activeShop: true,
+    productCSS: true
   });
 });
 

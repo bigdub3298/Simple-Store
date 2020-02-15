@@ -9,7 +9,7 @@ const shopRoutes = require("./routes/store");
 const app = express();
 
 //
-app.engine("hbs", expressHbs());
+app.engine("hbs", expressHbs({ defaultLayout: "main", extname: "hbs" }));
 // Set up view engine
 app.set("view engine", "hbs");
 // tell express where to find template files
