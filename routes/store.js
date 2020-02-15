@@ -8,7 +8,12 @@ const { products } = require("./admin");
 router.get("/", (req, res) => {
   // console.log(products);
   // res.sendFile(path.join(rootDirectory, "views", "store.html"));
-  res.render("store", { products, docTitle: "Store" });
+  res.render("store", {
+    layout: false,
+    products,
+    docTitle: "Store",
+    hasProducts: products.length > 0
+  });
 });
 
 module.exports = router;
