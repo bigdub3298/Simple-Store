@@ -18,3 +18,8 @@
 .form-control input:focus {
   outline-color: #00695c;
 }
+
+.product-form {
+  width: 600px;
+  margin: auto;
+}
