@@ -11,8 +11,10 @@ router.get("/", (req, res) => {
   res.render("store", {
     products,
     docTitle: "Store",
-    hasProducts: products.length > 0,
-    activeShop: true,
+    // hasProducts: products.length > 0,
+    activeProduct: false,
+    activeStore: true,
+    formCSS: false,
     productCSS: true
   });
 });
