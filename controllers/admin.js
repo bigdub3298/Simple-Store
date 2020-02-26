@@ -8,14 +8,19 @@ exports.getAddProductPage = (_, res) => {
 };
 
 exports.postAddProductPage = (req, res) => {
-  const p = new Product(req.body.title);
-  p.save();
+  const { title, imageURL, price, description } = req.body;
+
+  const product = new Product(title, imageURL, description, price);
+  product.save();
   res.redirect("/");
 };
 
 exports.getProductsPage = (req, res) => {
-  res.render("admin/products", {
-    docTitle: "Products",
-    path: "/admin/products"
+  Product.fetchAllProducts(products => {
+    res.render("admin/products", {
+      products,
+      docTitle: "Admin Products",
+      path: "/admin/products"
+    });
   });
 };

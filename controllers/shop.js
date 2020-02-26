@@ -25,8 +25,11 @@ exports.getCheckoutPage = (_, res) => {
 };
 
 exports.getIndexPage = (_, res) => {
-  res.render("shop/index", {
-    docTitle: "Homepage",
-    path: "/"
+  Product.fetchAllProducts(products => {
+    res.render("shop/index", {
+      products,
+      docTitle: "Homepage",
+      path: "/"
+    });
   });
 };
