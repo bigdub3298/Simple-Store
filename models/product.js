@@ -5,7 +5,7 @@ const getProductsFromFile = cb => {
   const p = path.join(
     path.dirname(process.mainModule.filename),
     "data",
-    "products.json"
+    "products-real.json"
   );
 
   fs.readFile(p, (err, data) => {
@@ -32,7 +32,7 @@ module.exports = class Product {
         path.join(
           path.dirname(process.mainModule.filename),
           "data",
-          "products.json"
+          "products-real.json"
         ),
         JSON.stringify(products),
         err => {

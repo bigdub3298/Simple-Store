@@ -5,6 +5,7 @@ const path = require("path");
 
 const { routes: adminRoutes } = require("./routes/admin");
 const shopRoutes = require("./routes/store");
+const errorController = require("./controllers/error");
 
 const app = express();
 
@@ -24,9 +25,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
-app.use((req, res) => {
-  // res.status(404).sendFile(path.join(__dirname, "views", "not-found.html"));
-  res.status(404).render("not-found", { docTitle: "Not Found" });
-});
+app.use(errorController.getErrorPage);
 
 app.listen(3000);
