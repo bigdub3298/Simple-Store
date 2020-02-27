@@ -17,6 +17,13 @@ exports.getCartPage = (_, res) => {
   });
 };
 
+exports.getOrdersPage = (_, res) => {
+  res.render("shop/orders.ejs", {
+    docTitle: "Your orders",
+    path: "/orders"
+  });
+};
+
 exports.getCheckoutPage = (_, res) => {
   res.render("shop/checkout.ejs", {
     docTitle: "Checkout",
