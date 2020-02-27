@@ -28,6 +28,11 @@ exports.getCartPage = (_, res) => {
   });
 };
 
+exports.postCartPage = (req, res) => {
+  console.log(req.body.id);
+  res.redirect("/");
+};
+
 exports.getOrdersPage = (_, res) => {
   res.render("shop/orders", {
     docTitle: "Your orders",
