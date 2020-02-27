@@ -10,22 +10,33 @@ exports.getProductsPage = (_, res) => {
   });
 };
 
+exports.getProductPage = (req, res) => {
+  const { id } = req.params;
+  Product.fetchById(id, product => {
+    res.render("shop/product-detail", {
+      product,
+      docTitle: "Product Detail",
+      path: "/products"
+    });
+  });
+};
+
 exports.getCartPage = (_, res) => {
-  res.render("shop/cart.ejs", {
+  res.render("shop/cart", {
     docTitle: "Cart",
     path: "/cart"
   });
 };
 
 exports.getOrdersPage = (_, res) => {
-  res.render("shop/orders.ejs", {
+  res.render("shop/orders", {
     docTitle: "Your orders",
     path: "/orders"
   });
 };
 
 exports.getCheckoutPage = (_, res) => {
-  res.render("shop/checkout.ejs", {
+  res.render("shop/checkout", {
     docTitle: "Checkout",
     path: "/checkout"
   });

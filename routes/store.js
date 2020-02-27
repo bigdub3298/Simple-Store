@@ -7,6 +7,7 @@ router.get("/cart", shopController.getCartPage);
 router.get("/orders", shopController.getOrdersPage);
 router.get("/checkout", shopController.getCheckoutPage);
 router.get("/products", shopController.getProductsPage);
+router.get("/products/:id", shopController.getProductPage);
 router.get("/", shopController.getIndexPage);
 
 module.exports = router;
