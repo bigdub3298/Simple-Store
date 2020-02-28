@@ -17,7 +17,7 @@ const app = express();
 
 app.set("view engine", "ejs");
 // tell express where to find template files
-app.set("views", path.join(__dirname, "views", "ejs"));
+app.set("views", path.join(__dirname, "views"));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
