@@ -23,7 +23,7 @@ exports.getEditProductPage = (req, res) => {
   }
 
   const { id } = req.params;
-  Product.fetchById(id, product => {
+  Product.fetchProductWithId(id, product => {
     res.render("admin/edit-product", {
       docTitle: "Edit Product",
       path: "/admin/edit-product",
@@ -40,7 +40,7 @@ exports.postEditProductPage = (req, res) => {
   res.redirect("/admin/products");
 };
 
-exports.getProductsPage = (req, res) => {
+exports.getProductsPage = (_, res) => {
   Product.fetchAllProducts(products => {
     res.render("admin/products", {
       products,
@@ -48,4 +48,10 @@ exports.getProductsPage = (req, res) => {
       path: "/admin/products"
     });
   });
+};
+
+exports.postDeleteProductPage = (req, res) => {
+  const { id } = req.body;
+  Product.deleteProductWithId(id);
+  res.redirect("/admin/products");
 };

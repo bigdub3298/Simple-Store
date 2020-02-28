@@ -65,10 +65,27 @@ module.exports = class Product {
     getProductsFromFile(cb);
   }
 
-  static fetchById(id, cb) {
+  static fetchProductWithId(id, cb) {
     getProductsFromFile(products => {
-      const product = products.filter(product => product.id === id)[0];
+      const product = products.find(product => product.id === id);
       cb(product);
+    });
+  }
+
+  static deleteProductWithId(id) {
+    getProductsFromFile(products => {
+      const updatedProducts = products.filter(product => product.id !== id);
+      fs.writeFile(
+        path.join(
+          path.dirname(process.mainModule.filename),
+          "data",
+          "products-real.json"
+        ),
+        JSON.stringify(updatedProducts),
+        err => {
+          console.log(err);
+        }
+      );
     });
   }
 };
