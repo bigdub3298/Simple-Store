@@ -8,55 +8,86 @@ const p = path.join(
 );
 
 module.exports = class Cart {
-  static addProduct(id, productPrice) {
-    fs.readFile(p, (err, data) => {
-      let cart = { products: [], totalPrice: 0 };
-      if (!err) {
-        cart = JSON.parse(data);
-      }
+  static addProduct(productId, productPrice) {
+    Cart.getCart(cart => {
+      const updatedCart = cart ? { ...cart } : { products: [], totalPrice: 0 };
 
-      const existingProduct = cart.products.find(product => product.id === id);
-      const existingProductIndex = cart.products.findIndex(
-        product => product.id === id
+      const existingProduct = updatedCart.products.find(
+        product => product.id === productId
       );
-      let updatedProduct;
+
       if (existingProduct) {
-        updatedProduct = { ...existingProduct, qty: existingProduct.qty + 1 };
-        cart.products = [...cart.products];
-        cart.products[existingProductIndex] = updatedProduct;
+        const updatedProducts = updatedCart.products.map(product =>
+          product.id === productId
+            ? { ...product, qty: product.qty + 1 }
+            : product
+        );
+        updatedCart.products = updatedProducts;
       } else {
-        updatedProduct = { id: id, qty: 1 };
-        cart.products = [...cart.products, updatedProduct];
+        updatedCart.products.push({ id: productId, qty: 1 });
       }
-      cart.totalPrice += +productPrice;
-      fs.writeFile(p, JSON.stringify(cart), err => {
+      updatedCart.totalPrice += +productPrice;
+
+      fs.writeFile(p, JSON.stringify(updatedCart), err => {
         console.log(err);
       });
     });
   }
 
-  static deleteProduct(id, productPrice) {
+  static deleteProduct(productId, productPrice) {
+    Cart.getCart(cart => {
+      if (cart) {
+        const updatedCart = { ...cart };
+        const deletedProduct = updatedCart.products.find(
+          product => product.id === productId
+        );
+
+        if (deletedProduct) {
+          const productQty = deletedProduct.qty;
+          const updatedProducts = updatedCart.products.filter(
+            product => product.id !== productId
+          );
+          updatedCart.products = updatedProducts;
+          updatedCart.totalPrice -= productQty * productPrice;
+
+          fs.writeFile(p, JSON.stringify(updatedCart), err => {
+            console.log(err);
+          });
+        }
+      }
+    });
+
+    // fs.readFile(p, (err, data) => {
+    //   if (err) {
+    //     return;
+    //   }
+
+    //   const updatedCart = { ...JSON.parse(data) };
+    //   const deletedProduct = updatedCart.products.find(
+    //     product => product.id === id
+    //   );
+
+    //   if (deletedProduct) {
+    //     const productQty = deletedProduct.qty;
+    //     const updatedProducts = updatedCart.products.filter(
+    //       product => product.id !== deletedProduct.id
+    //     );
+    //     updatedCart.products = updatedProducts;
+    //     updatedCart.totalPrice -= productQty * productPrice;
+
+    //     fs.writeFile(p, JSON.stringify(updatedCart), err => {
+    //       console.log(err);
+    //     });
+    //   }
+    // });
+  }
+
+  static getCart(cb) {
     fs.readFile(p, (err, data) => {
       if (err) {
-        return;
-      }
-
-      const updatedCart = { ...JSON.parse(data) };
-      const deletedProduct = updatedCart.products.find(
-        product => product.id === id
-      );
-
-      if (deletedProduct) {
-        const productQty = deletedProduct.qty;
-        const updatedProducts = updatedCart.products.filter(
-          product => product.id !== deletedProduct.id
-        );
-        updatedCart.products = updatedProducts;
-        updatedCart.totalPrice -= productQty * productPrice;
-
-        fs.writeFile(p, JSON.stringify(updatedCart), err => {
-          console.log(err);
-        });
+        cb(null);
+      } else {
+        cb(JSON.parse(data));
       }
     });
   }
