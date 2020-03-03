@@ -23,14 +23,16 @@ exports.getEditProductPage = (req, res) => {
   }
 
   const { id } = req.params;
-  Product.fetchProductWithId(id, product => {
-    res.render("admin/edit-product", {
-      docTitle: "Edit Product",
-      path: "/admin/edit-product",
-      product,
-      editing: editMode
-    });
-  });
+  Product.fetchProductWithId(id)
+    .then(({ rows }) => {
+      res.render("admin/edit-product", {
+        docTitle: "Edit Product",
+        path: "/admin/edit-product",
+        product: rows[0],
+        editing: editMode
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.postEditProductPage = (req, res) => {

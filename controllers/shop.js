@@ -28,13 +28,15 @@ exports.getProductsPage = (_, res) => {
 
 exports.getProductPage = (req, res) => {
   const { id } = req.params;
-  Product.fetchProductWithId(id, product => {
-    res.render("shop/product-detail", {
-      product,
-      docTitle: "Product Detail",
-      path: "/products"
-    });
-  });
+  Product.fetchProductWithId(id)
+    .then(({ rows }) => {
+      res.render("shop/product-detail", {
+        product: rows[0],
+        docTitle: "Product Detail",
+        path: "/products"
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.getCartPage = (_, res) => {

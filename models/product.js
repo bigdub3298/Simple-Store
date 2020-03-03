@@ -16,7 +16,9 @@ module.exports = class Product {
     return db.query("SELECT * FROM products");
   }
 
-  static fetchProductWithId(id) {}
+  static fetchProductWithId(id) {
+    return db.query(`SELECT * FROM products WHERE id = ${id}`);
+  }
 
   static deleteProductWithId(id) {}
 };
