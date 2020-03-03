@@ -40,39 +40,50 @@ exports.getProductPage = (req, res) => {
 
 exports.getCartPage = (_, res) => {
   Cart.getCart(cart => {
-    Product.fetchAllProducts(products => {
-      const cartProducts = [];
-      for (product of products) {
-        const cartProductData = cart.products.find(
-          prod => prod.id === product.id
-        );
-        if (cartProductData) {
-          cartProducts.push({ productData: product, qty: cartProductData.qty });
+    Product.fetchAllProducts()
+      .then(({ rows }) => {
+        const cartProducts = [];
+        for (product of rows) {
+          const cartProductData = cart.products.find(
+            prod => prod.id === product.id
+          );
+          if (cartProductData) {
+            cartProducts.push({
+              productData: product,
+              qty: cartProductData.qty
+            });
+          }
         }
-      }
-      res.render("shop/cart", {
-        docTitle: "Your Cart",
-        path: "/cart",
-        products: cartProducts
-      });
-    });
+        res.render("shop/cart", {
+          docTitle: "Your Cart",
+          path: "/cart",
+          products: cartProducts
+        });
+      })
+      .catch(err => console.log(err));
   });
 };
 
 exports.postCartPage = (req, res) => {
   const { id } = req.body;
-  Product.fetchProductWithId(id, product => {
-    Cart.addProduct(product.id, product.price);
-  });
-  res.redirect("/");
+  Product.fetchProductWithId(id)
+    .then(({ rows }) => {
+      const product = rows[0];
+      Cart.addProduct(product.id, product.price);
+      res.redirect("/");
+    })
+    .catch(err => console.log(err));
 };
 
 exports.postDeleteCartProduct = (req, res) => {
   const { id } = req.body;
-  Product.fetchProductWithId(id, product => {
-    Cart.deleteProduct(product.id, product.price);
-    res.redirect("/cart");
-  });
+  Product.fetchProductWithId(id)
+    .then(({ rows }) => {
+      const product = rows[0];
+      Cart.deleteProduct(product.id, product.price);
+      res.redirect("/cart");
+    })
+    .catch(err => console.log(err));
 };
 
 exports.getOrdersPage = (_, res) => {
