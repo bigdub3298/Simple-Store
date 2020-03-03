@@ -4,7 +4,6 @@ const Cart = require("../models/cart");
 exports.getIndexPage = (_, res) => {
   Product.fetchAllProducts()
     .then(({ rows }) => {
-      console.log(rows);
       res.render("shop/index", {
         products: rows,
         docTitle: "Homepage",
