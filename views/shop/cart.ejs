@@ -8,6 +8,7 @@ include('../includes/navigation.ejs')%>
     <li>
       <p><%= product.productData.title %> (<%= product.qty%>)</p>
       <form action="/cart-delete-product" method="POST">
+        <input type="hidden" name="id" value="<%= product.productData.id %>" />
         <button class="btn" type="submit">Delete</button>
       </form>
     </li>
