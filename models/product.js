@@ -1,22 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+const db = require("../database");
 const Cart = require("./cart");
-
-const getProductsFromFile = cb => {
-  const p = path.join(
-    path.dirname(process.mainModule.filename),
-    "data",
-    "products-real.json"
-  );
-
-  fs.readFile(p, (err, data) => {
-    if (err) {
-      cb([]);
-    } else {
-      cb(JSON.parse(data));
-    }
-  });
-};
 
 module.exports = class Product {
   constructor(title, imageURL, description, price, id = null) {
@@ -27,71 +10,13 @@ module.exports = class Product {
     this.price = price;
   }
 
-  save() {
-    getProductsFromFile(products => {
-      if (this.id) {
-        const updatedProducts = products.map(product =>
-          product.id === this.id ? this : product
-        );
-        fs.writeFile(
-          path.join(
-            path.dirname(process.mainModule.filename),
-            "data",
-            "products-real.json"
-          ),
-          JSON.stringify(updatedProducts),
-          err => {
-            console.log(err);
-          }
-        );
-      } else {
-        this.id = Math.random().toString();
-        products.push(this);
-        fs.writeFile(
-          path.join(
-            path.dirname(process.mainModule.filename),
-            "data",
-            "products-real.json"
-          ),
-          JSON.stringify(products),
-          err => {
-            console.log(err);
-          }
-        );
-      }
-    });
+  save() {}
+
+  static async fetchAllProducts() {
+    return db.query("SELECT * FROM products");
   }
 
-  static fetchAllProducts(cb) {
-    getProductsFromFile(cb);
-  }
+  static fetchProductWithId(id) {}
 
-  static fetchProductWithId(id, cb) {
-    getProductsFromFile(products => {
-      const product = products.find(product => product.id === id);
-      cb(product);
-    });
-  }
-
-  static deleteProductWithId(id) {
-    getProductsFromFile(products => {
-      const deletedProduct = products.find(product => product.id === id);
-      const updatedProducts = products.filter(product => product.id !== id);
-      fs.writeFile(
-        path.join(
-          path.dirname(process.mainModule.filename),
-          "data",
-          "products-real.json"
-        ),
-        JSON.stringify(updatedProducts),
-        err => {
-          if (err) {
-            console.log(err);
-          } else {
-            Cart.deleteProduct(id, deletedProduct.price);
-          }
-        }
-      );
-    });
-  }
+  static deleteProductWithId(id) {}
 };

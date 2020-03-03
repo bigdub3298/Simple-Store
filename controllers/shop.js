@@ -1,14 +1,29 @@
 const Product = require("../models/product");
 const Cart = require("../models/cart");
 
+exports.getIndexPage = (_, res) => {
+  Product.fetchAllProducts()
+    .then(({ rows }) => {
+      console.log(rows);
+      res.render("shop/index", {
+        products: rows,
+        docTitle: "Homepage",
+        path: "/"
+      });
+    })
+    .catch(err => console.log(err));
+};
+
 exports.getProductsPage = (_, res) => {
-  Product.fetchAllProducts(products => {
-    res.render("shop/product-list", {
-      products,
-      docTitle: "Store",
-      path: "/products"
-    });
-  });
+  Product.fetchAllProducts()
+    .then(({ rows }) => {
+      res.render("shop/product-list", {
+        products: rows,
+        docTitle: "Store",
+        path: "/products"
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.getProductPage = (req, res) => {
@@ -70,15 +85,5 @@ exports.getCheckoutPage = (_, res) => {
   res.render("shop/checkout", {
     docTitle: "Checkout",
     path: "/checkout"
-  });
-};
-
-exports.getIndexPage = (_, res) => {
-  Product.fetchAllProducts(products => {
-    res.render("shop/index", {
-      products,
-      docTitle: "Homepage",
-      path: "/"
-    });
   });
 };

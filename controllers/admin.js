@@ -32,6 +32,7 @@ exports.getEditProductPage = (req, res) => {
     });
   });
 };
+
 exports.postEditProductPage = (req, res) => {
   const { title, imageURL, price, description, id } = req.body;
 
@@ -41,13 +42,15 @@ exports.postEditProductPage = (req, res) => {
 };
 
 exports.getProductsPage = (_, res) => {
-  Product.fetchAllProducts(products => {
-    res.render("admin/products", {
-      products,
-      docTitle: "Admin Products",
-      path: "/admin/products"
-    });
-  });
+  Product.fetchAllProducts()
+    .then(({ rows }) => {
+      res.render("admin/products", {
+        products: rows,
+        docTitle: "Admin Products",
+        path: "/admin/products"
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.postDeleteProductPage = (req, res) => {
