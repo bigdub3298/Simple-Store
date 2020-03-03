@@ -23,9 +23,23 @@ exports.getProductPage = (req, res) => {
 };
 
 exports.getCartPage = (_, res) => {
-  res.render("shop/cart", {
-    docTitle: "Cart",
-    path: "/cart"
+  Cart.getCart(cart => {
+    Product.fetchAllProducts(products => {
+      const cartProducts = [];
+      for (product of products) {
+        const cartProductData = cart.products.find(
+          prod => prod.id === product.id
+        );
+        if (cartProductData) {
+          cartProducts.push({ productData: product, qty: cartProductData.qty });
+        }
+      }
+      res.render("shop/cart", {
+        docTitle: "Your Cart",
+        path: "/cart",
+        products: cartProducts
+      });
+    });
   });
 };
 

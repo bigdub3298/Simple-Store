@@ -2,7 +2,20 @@
 include('../includes/navigation.ejs')%>
 
 <main>
-  <h1>Cart</h1>
+  <% if (products.length > 0) { %>
+  <ul>
+    <% for (product of products) { %>
+    <li>
+      <p><%= product.productData.title %> (<%= product.qty%>)</p>
+      <form action="/cart-delete-product" method="POST">
+        <button class="btn" type="submit">Delete</button>
+      </form>
+    </li>
+    <% } %>
+  </ul>
+  <% } else { %>
+  <h1>No products in cart!</h1>
+  <% } %>
 </main>
 
 <%- include('../includes/end.ejs')%>
