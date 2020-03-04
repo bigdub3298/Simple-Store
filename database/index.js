@@ -1,7 +1,6 @@
-const { Pool } = require("pg");
+const Sequelize = require("sequelize");
 
-const connection = { host: "localhost", database: "simple_store" };
-const pool = new Pool(connection);
-pool.connect();
-
-module.exports = pool;
+module.exports = new Sequelize("simple_store", "", "", {
+  host: "localhost",
+  dialect: "postgres"
+});

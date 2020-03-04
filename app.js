@@ -5,6 +5,7 @@ const path = require("path");
 const { routes: adminRoutes } = require("./routes/admin");
 const shopRoutes = require("./routes/store");
 const errorController = require("./controllers/error");
+const sequelize = require("./database");
 
 const app = express();
 
@@ -19,4 +20,9 @@ app.use(shopRoutes);
 
 app.use(errorController.getErrorPage);
 
-app.listen(3000, () => console.log("Listening on port 3000"));
+sequelize
+  .sync()
+  .then(_ => {
+    app.listen(3000, () => console.log("Listening on port 3000"));
+  })
+  .catch(err => console.log(err));
