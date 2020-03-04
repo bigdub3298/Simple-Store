@@ -1,7 +1,7 @@
 const Product = require("../models/product");
 const Cart = require("../models/cart");
 
-exports.getAddProductPage = (_, res) => {
+exports.getAddProductPage = (req, res) => {
   res.render("admin/edit-product", {
     docTitle: "Add Product",
     path: "/admin/add-product",
@@ -12,10 +12,9 @@ exports.getAddProductPage = (_, res) => {
 exports.postAddProductPage = (req, res) => {
   const { title, imageurl, price, description } = req.body;
 
-  Product.create({ title, imageurl, price, description })
-    .then(result => {
-      console.log(result);
-    })
+  req.user
+    .createProduct({ title, imageurl, price, description })
+    .then(_ => res.redirect("/admin/products"))
     .catch(err => console.log(err));
 };
 
@@ -26,8 +25,15 @@ exports.getEditProductPage = (req, res) => {
   }
 
   const { id } = req.params;
-  Product.findByPk(id)
-    .then(product => {
+  req.user
+    .getProducts({ where: { id: id } })
+    .then(products => {
+      const product = products[0];
+
+      if (!product) {
+        res.redirect("/admin/products");
+      }
+
       res.render("admin/edit-product", {
         docTitle: "Edit Product",
         path: "/admin/edit-product",
@@ -53,8 +59,9 @@ exports.postEditProductPage = (req, res) => {
     .catch(err => console.log(err));
 };
 
-exports.getProductsPage = (_, res) => {
-  Product.findAll({ order: [["id", "ASC"]] })
+exports.getProductsPage = (req, res) => {
+  req.user
+    .getProducts({ order: [["id", "ASC"]] })
     .then(products => {
       res.render("admin/products", {
         products,
@@ -67,8 +74,12 @@ exports.getProductsPage = (_, res) => {
 
 exports.postDeleteProductPage = (req, res) => {
   const { id } = req.body;
-  Product.findByPk(id)
+  req.user
+    .getProducts({ where: { id: id } })
     .then(product => {
+      if (!product) {
+        res.redirect("/admin/products");
+      }
       Cart.deleteProduct(product.id, product.price);
       return product.destroy();
     })

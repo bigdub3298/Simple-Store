@@ -15,4 +15,4 @@ router.post("/edit-product", adminController.postEditProductPage);
 
 router.post("/delete-product", adminController.postDeleteProductPage);
 
-exports.routes = router;
+module.exports = router;
