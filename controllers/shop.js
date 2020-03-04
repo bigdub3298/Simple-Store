@@ -2,10 +2,10 @@ const Product = require("../models/product");
 const Cart = require("../models/cart");
 
 exports.getIndexPage = (_, res) => {
-  Product.fetchAllProducts()
-    .then(({ rows }) => {
+  Product.findAll({ order: [["id", "ASC"]] })
+    .then(products => {
       res.render("shop/index", {
-        products: rows,
+        products,
         docTitle: "Homepage",
         path: "/"
       });
@@ -14,10 +14,10 @@ exports.getIndexPage = (_, res) => {
 };
 
 exports.getProductsPage = (_, res) => {
-  Product.fetchAllProducts()
-    .then(({ rows }) => {
+  Product.findAll({ order: [["id", "ASC"]] })
+    .then(products => {
       res.render("shop/product-list", {
-        products: rows,
+        products,
         docTitle: "Store",
         path: "/products"
       });
@@ -27,10 +27,10 @@ exports.getProductsPage = (_, res) => {
 
 exports.getProductPage = (req, res) => {
   const { id } = req.params;
-  Product.fetchProductWithId(id)
-    .then(({ rows }) => {
+  Product.findByPk(id)
+    .then(product => {
       res.render("shop/product-detail", {
-        product: rows[0],
+        product,
         docTitle: "Product Detail",
         path: "/products"
       });
@@ -40,10 +40,10 @@ exports.getProductPage = (req, res) => {
 
 exports.getCartPage = (_, res) => {
   Cart.getCart(cart => {
-    Product.fetchAllProducts()
-      .then(({ rows }) => {
+    Product.findAll()
+      .then(products => {
         const cartProducts = [];
-        for (product of rows) {
+        for (product of products) {
           const cartProductData = cart.products.find(
             prod => prod.id === product.id
           );
@@ -66,9 +66,8 @@ exports.getCartPage = (_, res) => {
 
 exports.postCartPage = (req, res) => {
   const { id } = req.body;
-  Product.fetchProductWithId(id)
-    .then(({ rows }) => {
-      const product = rows[0];
+  Product.findByPk(id)
+    .then(product => {
       Cart.addProduct(product.id, product.price);
       res.redirect("/");
     })
@@ -77,9 +76,8 @@ exports.postCartPage = (req, res) => {
 
 exports.postDeleteCartProduct = (req, res) => {
   const { id } = req.body;
-  Product.fetchProductWithId(id)
-    .then(({ rows }) => {
-      const product = rows[0];
+  Product.fetchByPk(id)
+    .then(product => {
       Cart.deleteProduct(product.id, product.price);
       res.redirect("/cart");
     })
