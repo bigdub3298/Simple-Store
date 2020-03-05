@@ -41,12 +41,14 @@ Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 User.hasMany(Product);
 
 // sets up relationship between users and carts
-Cart.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 User.hasOne(Cart);
+Cart.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 
 // Sets up join table between carts and products
 Product.belongsToMany(Cart, { through: CartItem });
 Cart.belongsToMany(Product, { through: CartItem });
+
+let currentUser;
 
 sequelize
   // .sync({ force: true })
@@ -58,7 +60,15 @@ sequelize
     }
     return user;
   })
-  .then(_ => {
-    app.listen(3000, () => console.log("Listening on port 3000"));
+  .then(user => {
+    currentUser = user;
+    return user.getCart();
   })
+  .then(cart => {
+    if (!cart) {
+      return currentUser.createCart();
+    }
+    return cart;
+  })
+  .then(cart => app.listen(3000, () => console.log("Listening on port 3000")))
   .catch(err => console.log(err));

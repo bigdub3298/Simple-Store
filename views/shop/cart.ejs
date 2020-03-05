@@ -6,9 +6,9 @@ include('../includes/navigation.ejs')%>
   <ul>
     <% for (product of products) { %>
     <li>
-      <p><%= product.productData.title %> (<%= product.qty%>)</p>
+      <p><%= product.title %> (<%= product.cartItem.quantity%>)</p>
       <form action="/cart-delete-product" method="POST">
-        <input type="hidden" name="id" value="<%= product.productData.id %>" />
+        <input type="hidden" name="id" value="<%= product.id %>" />
         <button class="btn" type="submit">Delete</button>
       </form>
     </li>
