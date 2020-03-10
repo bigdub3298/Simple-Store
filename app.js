@@ -13,6 +13,8 @@ const Product = require("./models/product");
 const User = require("./models/user");
 const Cart = require("./models/cart");
 const CartItem = require("./models/cart-item");
+const Order = require("./models/order");
+const OrderItem = require("./models/order-item");
 
 const app = express();
 
@@ -47,6 +49,14 @@ Cart.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 // Sets up join table between carts and products
 Product.belongsToMany(Cart, { through: CartItem });
 Cart.belongsToMany(Product, { through: CartItem });
+
+// sets up relationship between user and order
+User.hasMany(Order);
+Order.belongsTo(User);
+
+// sets up join table between order and products
+// Product.belongsToMany(Order, { through: OrderItem });
+Order.belongsToMany(Product, { through: OrderItem });
 
 let currentUser;
 

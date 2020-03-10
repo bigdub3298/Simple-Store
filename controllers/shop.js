@@ -93,7 +93,6 @@ exports.postDeleteCartProduct = (req, res) => {
   req.user
     .getCart()
     .then(cart => {
-      currentCart = cart;
       return cart.getProducts({ where: { id: id } });
     })
     .then(products => {

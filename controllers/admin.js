@@ -76,11 +76,11 @@ exports.postDeleteProductPage = (req, res) => {
   const { id } = req.body;
   req.user
     .getProducts({ where: { id: id } })
-    .then(product => {
-      if (!product) {
+    .then(products => {
+      if (products.length === 0) {
         res.redirect("/admin/products");
       }
-      Cart.deleteProduct(product.id, product.price);
+      const product = products[0];
       return product.destroy();
     })
     .then(_ => res.redirect("/admin/products"))
