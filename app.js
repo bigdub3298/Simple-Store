@@ -5,6 +5,7 @@ const path = require("path");
 // Routers
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/store");
+const authRoutes = require("./routes/auth");
 const errorController = require("./controllers/error");
 
 // Sequelize
@@ -35,6 +36,7 @@ app.use((req, _, next) => {
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.getErrorPage);
 
