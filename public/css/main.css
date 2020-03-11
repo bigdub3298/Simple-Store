@@ -43,7 +43,7 @@ form {
 .main-header__nav {
   height: 100%;
   width: 100%;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: space-between;
 }
@@ -72,7 +72,7 @@ form {
 }
 
 .mobile-nav {
-  width: 30rem;
+  width: 20rem;
   height: 100vh;
   max-width: 90%;
   position: fixed;
