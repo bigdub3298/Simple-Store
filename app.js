@@ -1,6 +1,9 @@
+require("dotenv").config();
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
+const session = require("express-session");
 
 // Routers
 const adminRoutes = require("./routes/admin");
@@ -24,6 +27,13 @@ app.set("views", path.join(__dirname, "views"));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false
+  })
+);
 
 app.use((req, _, next) => {
   User.findByPk(1)

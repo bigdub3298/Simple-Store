@@ -1,23 +1,25 @@
 const Product = require("../models/product");
-const Order = (exports.getIndexPage = (_, res) => {
+const Order = (exports.getIndexPage = (req, res) => {
   Product.findAll({ order: [["id", "ASC"]] })
     .then(products => {
       res.render("shop/index", {
         products,
         docTitle: "Homepage",
-        path: "/"
+        path: "/",
+        isAuthenticated: req.session.isAuthenticated
       });
     })
     .catch(err => console.log(err));
 });
 
-exports.getProductsPage = (_, res) => {
+exports.getProductsPage = (req, res) => {
   Product.findAll({ order: [["id", "ASC"]] })
     .then(products => {
       res.render("shop/product-list", {
         products,
         docTitle: "Store",
-        path: "/products"
+        path: "/products",
+        isAuthenticated: req.session.isAuthenticated
       });
     })
     .catch(err => console.log(err));
@@ -30,7 +32,8 @@ exports.getProductPage = (req, res) => {
       res.render("shop/product-detail", {
         product,
         docTitle: "Product Detail",
-        path: "/products"
+        path: "/products",
+        isAuthenticated: req.session.isAuthenticated
       });
     })
     .catch(err => console.log(err));
@@ -44,7 +47,8 @@ exports.getCartPage = (req, res) => {
       res.render("shop/cart", {
         docTitle: "Your Cart",
         path: "/cart",
-        products
+        products,
+        isAuthenticated: req.session.isAuthenticated
       });
     })
     .catch(err => console.log(err));
@@ -105,11 +109,11 @@ exports.getOrdersPage = (req, res) => {
   req.user
     .getOrders({ include: "products" })
     .then(orders => {
-      console.log(orders);
       res.render("shop/orders", {
         docTitle: "Your orders",
         path: "/orders",
-        orders
+        orders,
+        isAuthenticated: req.session.isAuthenticated
       });
     })
     .catch(err => console.log(err));
@@ -144,9 +148,10 @@ exports.postOrdersPage = (req, res) => {
     .catch(err => console.log(err));
 };
 
-exports.getCheckoutPage = (_, res) => {
+exports.getCheckoutPage = (req, res) => {
   res.render("shop/checkout", {
     docTitle: "Checkout",
-    path: "/checkout"
+    path: "/checkout",
+    isAuthenticated: req.session.isAuthenticated
   });
 };

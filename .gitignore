@@ -2,3 +2,4 @@ node_modules
 products-real.json
 cart-real.json
 misc
+.env*
