@@ -1,19 +1,20 @@
 const Product = require("../models/product");
+const User = require("../models/user");
 
 exports.getAddProductPage = (req, res) => {
   res.render("admin/edit-product", {
     docTitle: "Add Product",
     path: "/admin/add-product",
     editing: false,
-    isAuthenticated: req.session.isAuthenticated
+    isAuthenticated: req.session.userId
   });
 };
 
 exports.postAddProductPage = (req, res) => {
   const { title, imageurl, price, description } = req.body;
 
-  req.user
-    .createProduct({ title, imageurl, price, description })
+  User.findByPk(req.session.userId)
+    .then(user => user.createProduct({ title, imageurl, price, description }))
     .then(_ => res.redirect("/admin/products"))
     .catch(err => console.log(err));
 };
@@ -25,8 +26,8 @@ exports.getEditProductPage = (req, res) => {
   }
 
   const { id } = req.params;
-  req.user
-    .getProducts({ where: { id: id } })
+  User.findByPk(req.session.userId)
+    .then(user => user.getProducts({ where: { id: id } }))
     .then(products => {
       const product = products[0];
 
@@ -39,7 +40,7 @@ exports.getEditProductPage = (req, res) => {
         path: "/admin/edit-product",
         product,
         editing: editMode,
-        isAuthenticated: req.session.isAuthenticated
+        isAuthenticated: req.session.userId
       });
     })
     .catch(err => console.log(err));
@@ -61,14 +62,14 @@ exports.postEditProductPage = (req, res) => {
 };
 
 exports.getProductsPage = (req, res) => {
-  req.user
-    .getProducts({ order: [["id", "ASC"]] })
+  User.findByPk(req.session.userId)
+    .then(user => user.getProducts({ order: [["id", "ASC"]] }))
     .then(products => {
       res.render("admin/products", {
         products,
         docTitle: "Admin Products",
         path: "/admin/products",
-        isAuthenticated: req.session.isAuthenticated
+        isAuthenticated: req.session.userId
       });
     })
     .catch(err => console.log(err));
@@ -76,8 +77,8 @@ exports.getProductsPage = (req, res) => {
 
 exports.postDeleteProductPage = (req, res) => {
   const { id } = req.body;
-  req.user
-    .getProducts({ where: { id: id } })
+  User.findByPk(req.session.userId)
+    .then(user => user.getProducts({ where: { id: id } }))
     .then(products => {
       if (products.length === 0) {
         res.redirect("/admin/products");

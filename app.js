@@ -3,9 +3,9 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
-const pg = require("pg");
 const session = require("express-session");
-const pgSession = require("connect-pg-simple")(session);
+const sequelizeStore = require("connect-session-sequelize")(session.Store);
+const db = require("./database");
 
 // Routers
 const adminRoutes = require("./routes/admin");
@@ -30,27 +30,16 @@ app.set("views", path.join(__dirname, "views"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
-const pool = pg.Pool({ host: "localhost", database: "simple_store" });
-
-const store = new pgSession({ pool, tableName: "userSessions" });
+const store = new sequelizeStore({ db, tableName: "userSessions" });
 
 const sessionConfig = {
-  store,
   secret: process.env.SECRET,
+  store,
   resave: false,
   saveUninitialized: false
 };
 
 app.use(session(sessionConfig));
-
-app.use((req, _, next) => {
-  User.findByPk(1)
-    .then(user => {
-      req.user = user;
-      next();
-    })
-    .catch(err => console.log(err));
-});
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
@@ -102,3 +91,5 @@ sequelize
   })
   .then(cart => app.listen(3000, () => console.log("Listening on port 3000")))
   .catch(err => console.log(err));
+
+store.sync();
