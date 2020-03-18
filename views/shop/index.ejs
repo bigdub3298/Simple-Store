@@ -18,7 +18,9 @@ include('../includes/navigation.ejs')%>
         </p>
       </div>
       <div class="card__actions">
-        <%- include('../includes/add-to-cart.ejs')%>
+        <a href="/products/<%= product.id %>" class="btn">Details</a>
+        <% if (isAuthenticated) { %> <%-
+        include('../includes/add-to-cart.ejs')%> <% } %>
       </div>
     </article>
     <% } %> <% } else {%>

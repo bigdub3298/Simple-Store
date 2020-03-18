@@ -42,8 +42,8 @@ exports.getProductPage = (req, res) => {
 };
 
 exports.getCartPage = (req, res) => {
-  User.findByPk(req.session.userId)
-    .then(user => user.getCart())
+  req.user
+    .getCart()
     .then(cart => cart.getProducts())
     .then(products => {
       res.render("shop/cart", {
@@ -60,8 +60,8 @@ exports.postCartPage = (req, res) => {
   const { id } = req.body;
   let currentCart;
 
-  User.findByPk(req.session.userId)
-    .then(user => user.getCart())
+  req.user
+    .getCart()
     .then(cart => {
       currentCart = cart;
       return cart.getProducts({ where: { id: id } });
@@ -94,8 +94,8 @@ exports.postCartPage = (req, res) => {
 exports.postDeleteCartProduct = (req, res) => {
   const { id } = req.body;
 
-  User.findByPk(req.session.userId)
-    .then(user => user.getCart())
+  req.user
+    .getCart()
     .then(cart => {
       return cart.getProducts({ where: { id: id } });
     })
@@ -108,8 +108,8 @@ exports.postDeleteCartProduct = (req, res) => {
 };
 
 exports.getOrdersPage = (req, res) => {
-  User.findByPk(req.session.userId)
-    .then(user => user.getOrders({ include: "products" }))
+  req.user
+    .getOrders({ include: "products" })
     .then(orders => {
       res.render("shop/orders", {
         docTitle: "Your orders",
@@ -124,8 +124,8 @@ exports.getOrdersPage = (req, res) => {
 exports.postOrdersPage = (req, res) => {
   let currentCart;
 
-  User.findByPk(req.session.userId)
-    .then(user => user.getCart())
+  req.user
+    .getCart()
     .then(cart => {
       currentCart = cart;
       return cart.getProducts();

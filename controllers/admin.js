@@ -13,8 +13,8 @@ exports.getAddProductPage = (req, res) => {
 exports.postAddProductPage = (req, res) => {
   const { title, imageurl, price, description } = req.body;
 
-  User.findByPk(req.session.userId)
-    .then(user => user.createProduct({ title, imageurl, price, description }))
+  req.user
+    .createProduct({ title, imageurl, price, description })
     .then(_ => res.redirect("/admin/products"))
     .catch(err => console.log(err));
 };
@@ -26,8 +26,8 @@ exports.getEditProductPage = (req, res) => {
   }
 
   const { id } = req.params;
-  User.findByPk(req.session.userId)
-    .then(user => user.getProducts({ where: { id: id } }))
+  req.user
+    .getProducts({ where: { id: id } })
     .then(products => {
       const product = products[0];
 
@@ -62,8 +62,8 @@ exports.postEditProductPage = (req, res) => {
 };
 
 exports.getProductsPage = (req, res) => {
-  User.findByPk(req.session.userId)
-    .then(user => user.getProducts({ order: [["id", "ASC"]] }))
+  req.user
+    .getProducts({ order: [["id", "ASC"]] })
     .then(products => {
       res.render("admin/products", {
         products,
@@ -77,8 +77,8 @@ exports.getProductsPage = (req, res) => {
 
 exports.postDeleteProductPage = (req, res) => {
   const { id } = req.body;
-  User.findByPk(req.session.userId)
-    .then(user => user.getProducts({ where: { id: id } }))
+  req.user
+    .getProducts({ where: { id: id } })
     .then(products => {
       if (products.length === 0) {
         res.redirect("/admin/products");

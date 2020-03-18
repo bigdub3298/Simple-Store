@@ -41,6 +41,19 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 
+app.use((req, _, next) => {
+  if (!req.session.userId) {
+    return next();
+  }
+
+  User.findByPk(req.session.userId)
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
+});
+
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
@@ -72,24 +85,7 @@ let currentUser;
 sequelize
   // .sync({ force: true })
   .sync()
-  .then(_ => User.findByPk(1))
-  .then(user => {
-    if (!user) {
-      return User.create({ name: "Test", email: "test@test.com" });
-    }
-    return user;
-  })
-  .then(user => {
-    currentUser = user;
-    return user.getCart();
-  })
-  .then(cart => {
-    if (!cart) {
-      return currentUser.createCart();
-    }
-    return cart;
-  })
-  .then(cart => app.listen(3000, () => console.log("Listening on port 3000")))
+  .then(_ => app.listen(3000, () => console.log("Listening on port 3000")))
   .catch(err => console.log(err));
 
 store.sync();

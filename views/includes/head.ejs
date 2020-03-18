@@ -6,8 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title><%= docTitle%></title>
     <link rel="stylesheet" href="/css/main.css" />
-    <% if (path === '/admin/add-product' || path === '/admin/edit-product' ||
-    path === '/login') { %>
+    <% if (['/admin/add-product', '/admin/edit-product', '/login',
+    '/signup'].includes(path)) { %>
     <link rel="stylesheet" href="/css/forms.css" />
     <% } %> <% if (path === '/cart') { %>
     <link rel="stylesheet" href="/css/cart.css" />

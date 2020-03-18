@@ -1,20 +1,44 @@
 const User = require("../models/user");
+const Cart = require("../models/cart");
+const bcrypt = require("bcrypt");
 
 exports.getLoginPage = (req, res) => {
   res.render("auth/login", {
     docTitle: "Login",
     path: "/login",
-    isAuthenticated: req.session.isAuthenticated
+    isAuthenticated: req.session.userId
   });
 };
 
 exports.postLoginPage = (req, res) => {
-  User.findByPk(1)
+  const { email, password } = req.body;
+
+  User.findOne({ where: { email } })
     .then(user => {
-      req.session.userId = user.id;
-      return user;
+      if (!user) {
+        return res.redirect("/login");
+      }
+
+      bcrypt
+        .compare(password, user.password)
+        .then(doMatch => {
+          if (!doMatch) {
+            return res.redirect("/login");
+          }
+
+          req.session.userId = user.id;
+          req.session.save(err => {
+            if (err) {
+              console.log(err);
+            }
+            res.redirect("/");
+          });
+        })
+        .catch(err => {
+          console.log(err);
+          res.redirect("/login");
+        });
     })
-    .then(_ => res.redirect("/"))
     .catch(err => console.log(err));
 };
 
@@ -25,4 +49,34 @@ exports.postLogoutPage = (req, res) => {
     }
     res.redirect("/");
   });
+};
+
+exports.getSignUpPage = (req, res) => {
+  res.render("auth/signup", {
+    docTitle: "Sign Up",
+    path: "/signup",
+    isAuthenticated: req.session.userId
+  });
+};
+
+exports.postSignUpPage = (req, res) => {
+  const { email, password, confirmedPassword } = req.body;
+
+  User.findOne({ where: { email } })
+    .then(user => {
+      if (!user) {
+        return bcrypt
+          .hash(password, 12)
+          .then(hashedPassword =>
+            User.create(
+              { email, password: hashedPassword, cart: {} },
+              { include: [Cart] }
+            )
+          );
+      }
+
+      res.redirect("/signup");
+    })
+    .then(_ => res.redirect("/login"))
+    .catch(err => console.log(err));
 };
