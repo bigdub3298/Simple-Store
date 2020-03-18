@@ -3,13 +3,15 @@ include('../includes/navigation.ejs')%>
 
 <main>
   <% if (orders.length > 0) { %>
-  <ul>
+  <ul class="orders">
     <% for (order of orders) {%>
-    <li>
+    <li class="orders__item">
       Order #<%= order.id %>
-      <ul>
+      <ul class="orders__products">
         <% for (product of order.products) { %>
-        <li><%= product.title %> (<%= product.orderItem.quantity %>)</li>
+        <li class="orders__products-item">
+          <%= product.title %> (<%= product.orderItem.quantity %>)
+        </li>
         <% } %>
       </ul>
     </li>

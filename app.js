@@ -1,11 +1,15 @@
 require("dotenv").config();
 
+// express
 const express = require("express");
 const bodyParser = require("body-parser");
 const path = require("path");
+
+// session
 const session = require("express-session");
 const sequelizeStore = require("connect-session-sequelize")(session.Store);
 const db = require("./database");
+const csurf = require("csurf");
 
 // Routers
 const adminRoutes = require("./routes/admin");
@@ -41,6 +45,10 @@ const sessionConfig = {
 
 app.use(session(sessionConfig));
 
+const csrfProtection = csurf();
+
+app.use(csrfProtection);
+
 app.use((req, _, next) => {
   if (!req.session.userId) {
     return next();
@@ -52,6 +60,12 @@ app.use((req, _, next) => {
       next();
     })
     .catch(err => console.log(err));
+});
+
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.userId;
+  res.locals.csrfToken = req.csrfToken();
+  next();
 });
 
 app.use("/admin", adminRoutes);

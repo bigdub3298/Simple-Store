@@ -11,6 +11,7 @@ include('../includes/navigation.ejs')%>
       <form action="/cart-delete-product" method="POST">
         <input type="hidden" value="<%= p.id %>" name="id" />
         <button class="btn danger" type="submit">Delete</button>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
       </form>
     </li>
     <% }) %>
@@ -19,6 +20,7 @@ include('../includes/navigation.ejs')%>
   <div class="centered">
     <form action="/create-order" method="POST">
       <button type="submit" class="btn">Order Now!</button>
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
     </form>
   </div>
 
