@@ -3,9 +3,13 @@ const Cart = require("../models/cart");
 const bcrypt = require("bcrypt");
 
 exports.getLoginPage = (req, res) => {
+  const errors = req.flash("error");
+  const errorMessage = errors.length > 0 ? errors[0] : null;
+
   res.render("auth/login", {
     docTitle: "Login",
-    path: "/login"
+    path: "/login",
+    errorMessage
   });
 };
 
@@ -15,14 +19,29 @@ exports.postLoginPage = (req, res) => {
   User.findOne({ where: { email } })
     .then(user => {
       if (!user) {
-        return res.redirect("/login");
+        req.flash("error", "The email or password you entered is incorrect.");
+        return req.session.save(err => {
+          if (err) {
+            console.log(err);
+          }
+          res.redirect("/login");
+        });
       }
 
       bcrypt
         .compare(password, user.password)
         .then(doMatch => {
           if (!doMatch) {
-            return res.redirect("/login");
+            req.flash(
+              "error",
+              "The email or password you entered is incorrect."
+            );
+            return req.session.save(err => {
+              if (err) {
+                console.log(err);
+              }
+              res.redirect("/login");
+            });
           }
 
           req.session.userId = user.id;
@@ -51,9 +70,12 @@ exports.postLogoutPage = (req, res) => {
 };
 
 exports.getSignUpPage = (req, res) => {
+  const errors = req.flash("error");
+  const errorMessage = errors.length > 0 ? errors[0] : null;
   res.render("auth/signup", {
     docTitle: "Sign Up",
-    path: "/signup"
+    path: "/signup",
+    errorMessage
   });
 };
 
@@ -70,11 +92,17 @@ exports.postSignUpPage = (req, res) => {
               { email, password: hashedPassword, cart: {} },
               { include: [Cart] }
             )
-          );
+          )
+          .then(_ => res.redirect("/login"));
       }
 
-      res.redirect("/signup");
+      req.flash("error", "An account with this email already exists.");
+      return req.session.save(err => {
+        if (err) {
+          console.log(err);
+        }
+        res.redirect("/signup");
+      });
     })
-    .then(_ => res.redirect("/login"))
     .catch(err => console.log(err));
 };

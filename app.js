@@ -10,6 +10,7 @@ const session = require("express-session");
 const sequelizeStore = require("connect-session-sequelize")(session.Store);
 const db = require("./database");
 const csurf = require("csurf");
+const flash = require("connect-flash");
 
 // Routers
 const adminRoutes = require("./routes/admin");
@@ -43,11 +44,11 @@ const sessionConfig = {
   saveUninitialized: false
 };
 
-app.use(session(sessionConfig));
-
 const csrfProtection = csurf();
 
+app.use(session(sessionConfig));
 app.use(csrfProtection);
+app.use(flash());
 
 app.use((req, _, next) => {
   if (!req.session.userId) {
