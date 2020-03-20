@@ -1,6 +1,10 @@
+require("dotenv").config();
+
+const bcrypt = require("bcrypt");
+const mailer = require("../sendgrid");
+
 const User = require("../models/user");
 const Cart = require("../models/cart");
-const bcrypt = require("bcrypt");
 
 exports.getLoginPage = (req, res) => {
   const errors = req.flash("error");
@@ -93,7 +97,18 @@ exports.postSignUpPage = (req, res) => {
               { include: [Cart] }
             )
           )
-          .then(_ => res.redirect("/login"));
+          .then(_ => {
+            const message = {
+              to: email,
+              from: process.env.EMAIL,
+              subject: "Thanks For Signing Up With SimpleStore",
+              html: "<h1>Your sign up was successful!</h1>"
+            };
+
+            res.redirect("/login");
+            return mailer.send(message);
+          })
+          .catch(err => console.log(err));
       }
 
       req.flash("error", "An account with this email already exists.");
