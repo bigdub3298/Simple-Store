@@ -1,6 +1,9 @@
 <%- include('../includes/head.ejs') %> <%- include('../includes/navigation.ejs')
 %>
 <main>
+  <% if (errorMessage) { %>
+  <div class="user-message user-message--error"><%= errorMessage %></div>
+  <% } %>
   <form class="product-form" action="<%= path %>" method="POST">
     <div class="form-control">
       <label for="title">Title</label>
@@ -8,7 +11,7 @@
         type="text"
         name="title"
         id="title"
-        value="<% if (editing) {%><%= product.title %><% } %>"
+        value="<% if (product) {%><%= product.title %><% } %>"
       />
     </div>
     <div class="form-control">
@@ -17,7 +20,7 @@
         type="text"
         name="imageurl"
         id="image-url"
-        value="<% if (editing) {%><%= product.imageurl %><% } %>"
+        value="<% if (product) {%><%= product.imageurl %><% } %>"
       />
     </div>
     <div class="form-control">
@@ -27,7 +30,7 @@
         name="price"
         id="price"
         step="0.01"
-        value="<% if (editing) {%><%= product.price %><% } %>"
+        value="<% if (product) {%><%= product.price %><% } %>"
       />
     </div>
     <div class="form-control">
