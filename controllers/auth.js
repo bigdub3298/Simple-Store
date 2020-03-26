@@ -16,7 +16,9 @@ exports.getLoginPage = (req, res) => {
   res.render("auth/login", {
     docTitle: "Login",
     path: "/login",
-    errorMessage
+    errorMessage,
+    email: null,
+    password: null
   });
 };
 
@@ -26,10 +28,11 @@ exports.postLoginPage = (req, res) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    res.status(422).render("auth/login", {
+    return res.status(422).render("auth/login", {
       docTitle: "Login",
       path: "/login",
-      errorMessage: errors.array()[0].msg
+      errorMessage: errors.array()[0].msg,
+      email
     });
   }
 
@@ -40,7 +43,8 @@ exports.postLoginPage = (req, res) => {
         return res.render("auth/login", {
           docTitle: "Login",
           path: "/login",
-          errorMessage: "The email or password you entered is incorrect."
+          errorMessage: "The email or password you entered is incorrect.",
+          email
         });
       }
 
@@ -52,10 +56,7 @@ exports.postLoginPage = (req, res) => {
         res.redirect("/");
       });
     })
-    .catch(err => {
-      console.log(err);
-      res.redirect("/login");
-    });
+    .catch(err => console.log(err));
 };
 
 exports.postLogoutPage = (req, res) => {
@@ -73,7 +74,10 @@ exports.getSignUpPage = (req, res) => {
   res.render("auth/signup", {
     docTitle: "Sign Up",
     path: "/signup",
-    errorMessage
+    errorMessage,
+    email: null,
+    password: null,
+    confirmPassword: null
   });
 };
 
@@ -86,7 +90,8 @@ exports.postSignUpPage = (req, res) => {
     return res.status(422).render("auth/signup", {
       docTitle: "Sign Up",
       path: "/signup",
-      errorMessage: errors.array()[0].msg
+      errorMessage: errors.array()[0].msg,
+      email
     });
   }
 
@@ -118,7 +123,8 @@ exports.getPasswordResetPage = (req, res) => {
   res.render("auth/reset", {
     docTitle: "Password Reset",
     path: "/reset",
-    errorMessage
+    errorMessage,
+    email: null
   });
 };
 
@@ -131,7 +137,8 @@ exports.postPasswordResetPage = (req, res) => {
     return res.status(422).render("auth/reset", {
       docTitle: "Password Reset",
       path: "/reset",
-      errorMessage: errors.array()[0].msg
+      errorMessage: errors.array()[0].msg,
+      email: email
     });
   }
 
@@ -139,8 +146,12 @@ exports.postPasswordResetPage = (req, res) => {
 
   crypto.randomBytes(32, (err, buffer) => {
     if (err) {
-      console.log(err);
-      return res.redirect("/reset");
+      return res.status(422).render("auth/reset", {
+        docTitle: "Password Reset",
+        path: "/reset",
+        errorMessage: err.message,
+        email
+      });
     }
 
     const token = buffer.toString("hex");

@@ -8,7 +8,12 @@
   <form class="login-form" action="/signup" method="POST" novalidate>
     <div class="form-control">
       <label for="email">E-Mail</label>
-      <input type="email" name="email" id="email" />
+      <input
+        type="email"
+        name="email"
+        id="email"
+        value="<% if (email) { %><%= email %><% } %>"
+      />
     </div>
     <div class="form-control">
       <label for="password">Password</label>

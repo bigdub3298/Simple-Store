@@ -13,6 +13,7 @@ router.post(
     check("email")
       .isEmail()
       .withMessage("Please enter a valid email")
+      .normalizeEmail()
       .custom((value, { req }) => {
         return User.findOne({ where: { email: value } }).then(user => {
           if (!user) {
@@ -37,6 +38,7 @@ router.post(
     check("email")
       .isEmail()
       .withMessage("Please enter a valid email.")
+      .normalizeEmail()
       .custom((value, { req }) => {
         return User.findOne({ where: { email: value } }).then(user => {
           if (user) {
@@ -44,16 +46,17 @@ router.post(
           }
         });
       }),
-    check(
-      "password",
-      "Please enter a password with at least 8 characters."
-    ).isLength({ min: 8 }),
-    check("confirmedPassword").custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error("Passwords must match.");
-      }
-      return true;
-    })
+    check("password", "Please enter a password with at least 8 characters.")
+      .trim()
+      .isLength({ min: 8 }),
+    check("confirmedPassword")
+      .trim()
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error("Passwords must match.");
+        }
+        return true;
+      })
   ],
   authController.postSignUpPage
 );
@@ -66,6 +69,7 @@ router.post(
     check("email")
       .isEmail()
       .withMessage("Please enter a valid email")
+      .normalizeEmail()
       .custom((value, { req }) => {
         return User.findOne({ where: { email: value } }).then(user => {
           if (!user) {
@@ -83,16 +87,17 @@ router.get("/reset/:token", authController.getNewPasswordPage);
 router.post(
   "/new-password",
   [
-    check(
-      "password",
-      "Please enter a password with at least 8 characters."
-    ).isLength({ min: 8 }),
-    check("confirmPassword").custom((value, { req }) => {
-      if (value !== req.body.password) {
-        throw new Error("Passwords must match.");
-      }
-      return true;
-    })
+    check("password", "Please enter a password with at least 8 characters.")
+      .trim()
+      .isLength({ min: 8 }),
+    check("confirmPassword")
+      .trim()
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error("Passwords must match.");
+        }
+        return true;
+      })
   ],
   authController.postNewPasswordPage
 );
