@@ -56,7 +56,11 @@ exports.postLoginPage = (req, res) => {
         res.redirect("/");
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postLogoutPage = (req, res) => {
@@ -114,7 +118,11 @@ exports.postSignUpPage = (req, res) => {
       res.redirect("/login");
       return mailer.send(message);
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getPasswordResetPage = (req, res) => {
@@ -204,7 +212,11 @@ exports.getNewPasswordPage = (req, res) => {
         token
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postNewPasswordPage = (req, res) => {
@@ -252,7 +264,15 @@ exports.postNewPasswordPage = (req, res) => {
           res.redirect("/login");
           return mailer.send(message);
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+          const error = new Error(err);
+          err.httpStatusCode = 500;
+          return next(error);
+        });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };

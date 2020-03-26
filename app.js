@@ -57,10 +57,15 @@ app.use((req, _, next) => {
 
   User.findByPk(req.session.userId)
     .then(user => {
+      if (!user) {
+        return next();
+      }
       req.user = user;
       next();
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      next(new Error(err));
+    });
 });
 
 app.use((req, res, next) => {
@@ -73,7 +78,16 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 
-app.use(errorController.getErrorPage);
+app.get("/500", errorController.get500);
+
+app.use(errorController.get404);
+
+app.use((error, req, res, next) => {
+  res.status(500).render("500", {
+    docTitle: "Error",
+    path: "/500"
+  });
+});
 
 // sets up relationship between users and products
 Product.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
