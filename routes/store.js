@@ -12,6 +12,7 @@ router.post(
   shopController.postDeleteCartProduct
 );
 router.get("/orders", isAuth, shopController.getOrdersPage);
+router.get("/orders/:id", isAuth, shopController.getInvoice);
 router.post("/create-order", isAuth, shopController.postOrdersPage);
 router.get("/checkout", isAuth, shopController.getCheckoutPage);
 router.get("/products", shopController.getProductsPage);

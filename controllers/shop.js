@@ -1,7 +1,9 @@
+const fs = require("fs");
+const path = require("path");
 const Product = require("../models/product");
 const User = require("../models/user");
 
-exports.getIndexPage = (req, res) => {
+exports.getIndexPage = (req, res, next) => {
   Product.findAll({ order: [["id", "ASC"]] })
     .then(products => {
       res.render("shop/index", {
@@ -10,10 +12,14 @@ exports.getIndexPage = (req, res) => {
         path: "/"
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-exports.getProductsPage = (req, res) => {
+exports.getProductsPage = (req, res, next) => {
   Product.findAll({ order: [["id", "ASC"]] })
     .then(products => {
       res.render("shop/product-list", {
@@ -22,10 +28,14 @@ exports.getProductsPage = (req, res) => {
         path: "/products"
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-exports.getProductPage = (req, res) => {
+exports.getProductPage = (req, res, next) => {
   const { id } = req.params;
   Product.findByPk(id)
     .then(product => {
@@ -35,10 +45,14 @@ exports.getProductPage = (req, res) => {
         path: "/products"
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-exports.getCartPage = (req, res) => {
+exports.getCartPage = (req, res, next) => {
   req.user
     .getCart()
     .then(cart => cart.getProducts())
@@ -49,10 +63,14 @@ exports.getCartPage = (req, res) => {
         products
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-exports.postCartPage = (req, res) => {
+exports.postCartPage = (req, res, next) => {
   const { id } = req.body;
   let currentCart;
 
@@ -84,10 +102,14 @@ exports.postCartPage = (req, res) => {
     .then(_ => {
       res.redirect("/");
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-exports.postDeleteCartProduct = (req, res) => {
+exports.postDeleteCartProduct = (req, res, next) => {
   const { id } = req.body;
 
   req.user
@@ -100,10 +122,14 @@ exports.postDeleteCartProduct = (req, res) => {
       return product.cartItem.destroy();
     })
     .then(_ => res.redirect("/cart"))
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-exports.getOrdersPage = (req, res) => {
+exports.getOrdersPage = (req, res, next) => {
   req.user
     .getOrders({ include: "products" })
     .then(orders => {
@@ -113,10 +139,14 @@ exports.getOrdersPage = (req, res) => {
         orders
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-exports.postOrdersPage = (req, res) => {
+exports.postOrdersPage = (req, res, next) => {
   let currentCart;
 
   req.user
@@ -142,10 +172,41 @@ exports.postOrdersPage = (req, res) => {
     .then(result => {
       res.redirect("/orders");
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      const error = new Error(err);
+      err.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
-exports.getCheckoutPage = (req, res) => {
+exports.getInvoice = (req, res, next) => {
+  const { id } = req.params;
+  Order.findOne({ where: { id } })
+    .then(order => {
+      if (!order) {
+        return next(new Error("No order found"));
+      }
+
+      if (order.userId !== req.user.id) {
+        return next(new Error("Unauthorized"));
+      }
+
+      const invoiceName = `invoice-${id}.pdf`;
+      const invoicePath = path.join("invoices", invoiceName);
+      fs.readFile(invoicePath, (err, data) => {
+        if (err) {
+          return next(err);
+        }
+
+        res.setHeader("Content-Disposition", `inline; filename=${invoiceName}`);
+        res.setHeader("Content-Type", "application/pdf");
+        res.send(data);
+      });
+    })
+    .catch(err => next(err));
+};
+
+exports.getCheckoutPage = (req, res, next) => {
   res.render("shop/checkout", {
     docTitle: "Checkout",
     path: "/checkout"
