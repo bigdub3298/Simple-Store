@@ -6,12 +6,12 @@ include('../includes/navigation.ejs')%>
   <ul class="orders">
     <% for (order of orders) {%>
     <li class="orders__item">
-      Order #<%= order.id %>
+      Order #<%= order.id %> -
+      <a href="/orders/<%= order.id %>" target="_blank">Invoice</a>
       <ul class="orders__products">
         <% for (product of order.products) { %>
         <li class="orders__products-item">
-          <%= product.title %> (<%= product.orderItem.quantity %>) -
-          <a href="/orders/<%= order.id %>" target="_blank">Invoice</a>
+          <%= product.title %> (<%= product.orderItem.quantity %>)
         </li>
         <% } %>
       </ul>

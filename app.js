@@ -46,7 +46,7 @@ const storage = multer.diskStorage({
     cb(null, "images");
   },
   filename: function(req, file, cb) {
-    cb(null, new Date().toISOString() + file.originalname);
+    cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
 
@@ -104,6 +104,7 @@ app.get("/500", errorController.get500);
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {
+  console.log(error);
   res.status(500).render("500", {
     docTitle: "Error",
     path: "/500"

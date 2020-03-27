@@ -1,7 +1,9 @@
 const fs = require("fs");
 const path = require("path");
+const pdfDocument = require("pdfkit");
+
 const Product = require("../models/product");
-const User = require("../models/user");
+const Order = require("../models/order");
 
 exports.getIndexPage = (req, res, next) => {
   Product.findAll({ order: [["id", "ASC"]] })
@@ -181,7 +183,7 @@ exports.postOrdersPage = (req, res, next) => {
 
 exports.getInvoice = (req, res, next) => {
   const { id } = req.params;
-  Order.findOne({ where: { id } })
+  Order.findOne({ where: { id }, include: "products" })
     .then(order => {
       if (!order) {
         return next(new Error("No order found"));
@@ -191,17 +193,53 @@ exports.getInvoice = (req, res, next) => {
         return next(new Error("Unauthorized"));
       }
 
-      const invoiceName = `invoice-${id}.pdf`;
-      const invoicePath = path.join("invoices", invoiceName);
-      fs.readFile(invoicePath, (err, data) => {
-        if (err) {
-          return next(err);
-        }
+      const invoiceName = `Invoice-${id.toString().padStart(5, "0")}.pdf`;
+      const doc = new pdfDocument();
+      res.setHeader("Content-Disposition", `inline; filename=${invoiceName}`);
+      res.setHeader("Content-Type", "application/pdf");
+      doc.pipe(res);
 
-        res.setHeader("Content-Disposition", `inline; filename=${invoiceName}`);
-        res.setHeader("Content-Type", "application/pdf");
-        res.send(data);
-      });
+      const dateFormatOptions = {
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+      };
+
+      doc
+        .fillColor("grey")
+        .lineGap(1)
+        .fontSize(20)
+        .text(`Invoice #${id.toString().padStart(5, "0")}`)
+        .fontSize(12)
+        .text(
+          `Date: ${new Date(order.createdAt).toLocaleDateString(
+            undefined,
+            dateFormatOptions
+          )}`
+        )
+        .text(`User ID: ${order.userId}`)
+        .text("------------------------------------------------------")
+        .moveDown()
+        .fillColor("black")
+        .fontSize(20)
+        .text("Order Items:")
+        .fontSize(12)
+        .list(
+          order.products.map(
+            product =>
+              `${product.title} - ${product.orderItem.quantity} x $${product.price}`
+          )
+        )
+        .moveDown()
+        .text("------------------------------------------------------")
+        .text(
+          `Total: $${order.products.reduce(
+            (accum, product) =>
+              accum + product.price * product.orderItem.quantity,
+            0
+          )}`
+        )
+        .end();
     })
     .catch(err => next(err));
 };
