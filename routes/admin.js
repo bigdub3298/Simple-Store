@@ -1,7 +1,7 @@
 const express = require("express");
 const isAuth = require("../middleware/isAuth");
 const router = express.Router();
-const { check } = require("express-validator/check");
+const { check } = require("express-validator");
 
 const adminController = require("../controllers/admin");
 
@@ -15,7 +15,6 @@ router.post(
       .isLength({ min: 3 })
       .withMessage("Title must be at least 3 characters.")
       .custom((value, { req }) => {
-        console.log(value);
         if (/[^A-Za-z0-9\ ]/.test(value)) {
           throw new Error(
             "Title can only contain letters, numbers, and spaces."
@@ -23,7 +22,6 @@ router.post(
         }
         return true;
       }),
-    check("imageurl", "Please enter a valid Image URL.").isURL(),
     check("price", "Price must be a decimal number.").isFloat(),
     check("description", "Description must be at least 5 characters.")
       .trim()
@@ -53,7 +51,6 @@ router.post(
         }
         return true;
       }),
-    check("imageurl", "Please enter a valid Image URL.").isURL(),
     check("price", "Price must be a decimal number.").isFloat(),
     check("description", "Description must be at least 5 characters.")
       .trim()

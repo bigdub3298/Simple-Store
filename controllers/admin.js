@@ -1,8 +1,8 @@
 const Product = require("../models/product");
 
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
-exports.getAddProductPage = (req, res) => {
+exports.getAddProductPage = (req, res, next) => {
   res.render("admin/edit-product", {
     docTitle: "Add Product",
     path: "/admin/add-product",
@@ -12,23 +12,36 @@ exports.getAddProductPage = (req, res) => {
   });
 };
 
-exports.postAddProductPage = (req, res) => {
-  const { title, imageurl, price, description } = req.body;
+exports.postAddProductPage = (req, res, next) => {
+  const {
+    body: { title, price, description },
+    file: image
+  } = req;
+
+  if (!image) {
+    return res.status(422).render("admin/edit-product", {
+      docTitle: "Add Product",
+      path: "/admin/add-product",
+      product: { title, price, description },
+      editing: false,
+      errorMessage: "Attached file is not an image."
+    });
+  }
 
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.render("admin/edit-product", {
+    return res.status(422).render("admin/edit-product", {
       docTitle: "Add Product",
       path: "/admin/add-product",
-      product: { title, imageurl, price, description },
+      product: { title, price, description },
       editing: false,
       errorMessage: errors.array()[0].msg
     });
   }
 
   req.user
-    .createProduct({ title, imageurl, price, description })
+    .createProduct({ title, image: image.path, price, description })
     .then(_ => res.redirect("/admin/products"))
     .catch(err => {
       const error = new Error(err);
@@ -37,7 +50,7 @@ exports.postAddProductPage = (req, res) => {
     });
 };
 
-exports.getEditProductPage = (req, res) => {
+exports.getEditProductPage = (req, res, next) => {
   const { edit: editMode } = req.query;
   if (!editMode) {
     return res.redirect("/");
@@ -50,7 +63,7 @@ exports.getEditProductPage = (req, res) => {
       const product = products[0];
 
       if (!product) {
-        return res.render("admin/edit-product", {
+        return res.status(422).render("admin/edit-product", {
           docTitle: "Edit Product",
           path: "/admin/edit-product",
           product: null,
@@ -74,16 +87,19 @@ exports.getEditProductPage = (req, res) => {
     });
 };
 
-exports.postEditProductPage = (req, res) => {
-  const { title, imageurl, price, description, id } = req.body;
+exports.postEditProductPage = (req, res, next) => {
+  const {
+    body: { title, price, description, id },
+    file: image
+  } = req;
 
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.render("admin/edit-product", {
+    return res.status(422).render("admin/edit-product", {
       docTitle: "Edit Product",
       path: "/admin/edit-product",
-      product: { title, imageurl, price, description, id },
+      product: { title, price, description, id },
       editing: true,
       errorMessage: errors.array()[0].msg
     });
@@ -93,7 +109,7 @@ exports.postEditProductPage = (req, res) => {
     .getProducts({ where: { id } })
     .then(products => {
       if (products.length === 0) {
-        return res.render("admin/edit-product", {
+        return res.status(422).render("admin/edit-product", {
           docTitle: "Edit Product",
           path: "/admin/edit-product",
           product,
@@ -103,7 +119,9 @@ exports.postEditProductPage = (req, res) => {
       }
       const product = products[0];
       product.title = title;
-      product.imageurl = imageurl;
+      if (image) {
+        product.image = image.path;
+      }
       product.price = price;
       product.description = description;
       return product.save().then(_ => res.redirect("/admin/products"));
@@ -115,7 +133,7 @@ exports.postEditProductPage = (req, res) => {
     });
 };
 
-exports.getProductsPage = (req, res) => {
+exports.getProductsPage = (req, res, next) => {
   req.user
     .getProducts({ order: [["id", "ASC"]] })
     .then(products => {
@@ -132,13 +150,17 @@ exports.getProductsPage = (req, res) => {
     });
 };
 
-exports.postDeleteProductPage = (req, res) => {
+exports.postDeleteProductPage = (req, res, next) => {
   const { id } = req.body;
   req.user
     .getProducts({ where: { id } })
     .then(products => {
       if (products.length === 0) {
-        return res.redirect("/admin/products");
+        return res.status(422).render("admin/products", {
+          products,
+          docTitle: "Admin Products",
+          path: "/admin/products"
+        });
       }
       const product = products[0];
       return product.destroy().then(_ => res.redirect("/admin/products"));

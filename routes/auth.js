@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { check } = require("express-validator/check");
+const { check } = require("express-validator");
 
 const User = require("../models/user");
 
@@ -49,7 +49,7 @@ router.post(
     check("password", "Please enter a password with at least 8 characters.")
       .trim()
       .isLength({ min: 8 }),
-    check("confirmedPassword")
+    check("confirmPassword")
       .trim()
       .custom((value, { req }) => {
         if (value !== req.body.password) {

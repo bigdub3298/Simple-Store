@@ -4,7 +4,7 @@ const Sequelize = require("sequelize");
 const bcrypt = require("bcrypt");
 const mailer = require("../sendgrid");
 const crypto = require("crypto");
-const { validationResult } = require("express-validator/check");
+const { validationResult } = require("express-validator");
 
 const User = require("../models/user");
 const Cart = require("../models/cart");

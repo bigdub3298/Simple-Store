@@ -4,7 +4,13 @@
   <% if (errorMessage) { %>
   <div class="user-message user-message--error"><%= errorMessage %></div>
   <% } %>
-  <form class="product-form" action="<%= path %>" method="POST" novalidate>
+  <form
+    class="product-form"
+    action="<%= path %>"
+    method="POST"
+    enctype="multipart/form-data"
+    novalidate
+  >
     <div class="form-control">
       <label for="title">Title</label>
       <input
@@ -15,13 +21,8 @@
       />
     </div>
     <div class="form-control">
-      <label for="image-url">Image URL</label>
-      <input
-        type="text"
-        name="imageurl"
-        id="image-url"
-        value="<% if (product) {%><%= product.imageurl %><% } %>"
-      />
+      <label for="image">Image</label>
+      <input type="file" name="image" id="image" />
     </div>
     <div class="form-control">
       <label for="price">Price</label>
@@ -36,7 +37,7 @@
     <div class="form-control">
       <label for="description">description</label>
       <textarea name="description" id="description" rows="5">
-<% if (editing) {%><%= product.description %> <% } %></textarea
+<% if (product) {%><%= product.description %> <% } %></textarea
       >
     </div>
     <% if (editing) {%>
