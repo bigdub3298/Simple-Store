@@ -1,4 +1,5 @@
 const Product = require("../models/product");
+const fileHelper = require("../util/file");
 
 const { validationResult } = require("express-validator");
 
@@ -120,6 +121,7 @@ exports.postEditProductPage = (req, res, next) => {
       const product = products[0];
       product.title = title;
       if (image) {
+        fileHelper.deleteFile(product.image);
         product.image = image.path;
       }
       product.price = price;
@@ -150,7 +152,7 @@ exports.getProductsPage = (req, res, next) => {
       });
     })
     .then(products => {
-      res.render("shop/product-list", {
+      res.render("admin/products", {
         products,
         docTitle: "Admin Products",
         path: "/admin/products",
@@ -165,21 +167,6 @@ exports.getProductsPage = (req, res, next) => {
       error.httpStatusCode = 500;
       next(err);
     });
-
-  // req.user
-  //   .getProducts({ order: [["id", "ASC"]] })
-  //   .then(products => {
-  //     res.render("admin/products", {
-  //       products,
-  //       docTitle: "Admin Products",
-  //       path: "/admin/products"
-  //     });
-  //   })
-  //   .catch(err => {
-  //     const error = new Error(err);
-  //     err.httpStatusCode = 500;
-  //     return next(error);
-  //   });
 };
 
 exports.postDeleteProductPage = (req, res, next) => {
@@ -195,6 +182,7 @@ exports.postDeleteProductPage = (req, res, next) => {
         });
       }
       const product = products[0];
+      fileHelper.deleteFile(product.image);
       return product.destroy().then(_ => res.redirect("/admin/products"));
     })
     .catch(err => {

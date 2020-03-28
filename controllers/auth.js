@@ -2,7 +2,7 @@ require("dotenv").config();
 
 const Sequelize = require("sequelize");
 const bcrypt = require("bcrypt");
-const mailer = require("../sendgrid");
+const mailer = require("../util/sendgrid");
 const crypto = require("crypto");
 const { validationResult } = require("express-validator");
 
