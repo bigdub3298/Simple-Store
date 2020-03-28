@@ -28,10 +28,11 @@ include('../includes/navigation.ejs')%>
         </form>
       </div>
     </article>
-    <% } %> <% } else {%>
-    <h1>No Products!</h1>
-    <% }%>
+    <% } %>
   </div>
+  <%- include('../includes/pagination.ejs')%> <% } else {%>
+  <h1>No Products!</h1>
+  <% }%>
 </main>
 
 <%- include('../includes/end.ejs')%>

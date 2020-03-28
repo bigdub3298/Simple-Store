@@ -134,20 +134,52 @@ exports.postEditProductPage = (req, res, next) => {
 };
 
 exports.getProductsPage = (req, res, next) => {
-  req.user
-    .getProducts({ order: [["id", "ASC"]] })
+  const PRODUCTS_PER_PAGE = 1;
+  const page = req.query.page || 1;
+
+  let totalProducts;
+
+  Product.count({ where: { userId: req.user.id } })
+    .then(count => {
+      totalProducts = count;
+      return Product.findAll({
+        where: { userId: req.user.id },
+        offset: (page - 1) * PRODUCTS_PER_PAGE,
+        limit: PRODUCTS_PER_PAGE,
+        order: [["id", "ASC"]]
+      });
+    })
     .then(products => {
-      res.render("admin/products", {
+      res.render("shop/product-list", {
         products,
         docTitle: "Admin Products",
-        path: "/admin/products"
+        path: "/admin/products",
+        currentPage: +page,
+        hasPreviousPage: +page > 2,
+        hasNextPage: +page * PRODUCTS_PER_PAGE < totalProducts - 1,
+        lastPage: Math.ceil(totalProducts / PRODUCTS_PER_PAGE)
       });
     })
     .catch(err => {
       const error = new Error(err);
-      err.httpStatusCode = 500;
-      return next(error);
+      error.httpStatusCode = 500;
+      next(err);
     });
+
+  // req.user
+  //   .getProducts({ order: [["id", "ASC"]] })
+  //   .then(products => {
+  //     res.render("admin/products", {
+  //       products,
+  //       docTitle: "Admin Products",
+  //       path: "/admin/products"
+  //     });
+  //   })
+  //   .catch(err => {
+  //     const error = new Error(err);
+  //     err.httpStatusCode = 500;
+  //     return next(error);
+  //   });
 };
 
 exports.postDeleteProductPage = (req, res, next) => {

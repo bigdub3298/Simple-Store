@@ -1,39 +1,71 @@
-const fs = require("fs");
-const path = require("path");
 const pdfDocument = require("pdfkit");
 
 const Product = require("../models/product");
 const Order = require("../models/order");
 
 exports.getIndexPage = (req, res, next) => {
-  Product.findAll({ order: [["id", "ASC"]] })
+  const PRODUCTS_PER_PAGE = 1;
+  const page = req.query.page || 1;
+
+  let totalProducts;
+
+  Product.count()
+    .then(count => {
+      totalProducts = count;
+      return Product.findAll({
+        offset: (page - 1) * PRODUCTS_PER_PAGE,
+        limit: PRODUCTS_PER_PAGE,
+        order: [["id", "ASC"]]
+      });
+    })
     .then(products => {
       res.render("shop/index", {
         products,
         docTitle: "Homepage",
-        path: "/"
+        path: "/",
+        currentPage: +page,
+        hasPreviousPage: +page > 2,
+        hasNextPage: +page * PRODUCTS_PER_PAGE < totalProducts - 1,
+        lastPage: Math.ceil(totalProducts / PRODUCTS_PER_PAGE)
       });
     })
     .catch(err => {
       const error = new Error(err);
-      err.httpStatusCode = 500;
-      return next(error);
+      error.httpStatusCode = 500;
+      next(err);
     });
 };
 
 exports.getProductsPage = (req, res, next) => {
-  Product.findAll({ order: [["id", "ASC"]] })
+  const PRODUCTS_PER_PAGE = 1;
+  const page = req.query.page || 1;
+
+  let totalProducts;
+
+  Product.count()
+    .then(count => {
+      totalProducts = count;
+      return Product.findAll({
+        offset: (page - 1) * PRODUCTS_PER_PAGE,
+        limit: PRODUCTS_PER_PAGE,
+        order: [["id", "ASC"]]
+      });
+    })
     .then(products => {
       res.render("shop/product-list", {
         products,
-        docTitle: "Store",
-        path: "/products"
+        docTitle: "Products",
+        path: "/products",
+        currentPage: +page,
+        hasPreviousPage: +page > 2,
+        hasNextPage: +page * PRODUCTS_PER_PAGE < totalProducts - 1,
+        lastPage: Math.ceil(totalProducts / PRODUCTS_PER_PAGE)
       });
     })
     .catch(err => {
       const error = new Error(err);
-      err.httpStatusCode = 500;
-      return next(error);
+      error.httpStatusCode = 500;
+      next(err);
     });
 };
 
