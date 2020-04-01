@@ -40,7 +40,7 @@ exports.postLoginPage = (req, res) => {
     .compare(password, req.user.password)
     .then(doMatch => {
       if (!doMatch) {
-        return res.render("auth/login", {
+        return res.status(422).render("auth/login", {
           docTitle: "Login",
           path: "/login",
           errorMessage: "The email or password you entered is incorrect.",

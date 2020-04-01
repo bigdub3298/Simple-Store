@@ -1,14 +1,15 @@
 const express = require("express");
-const isAuth = require("../middleware/isAuth");
+const authenticate = require("../middleware/authentication");
 const router = express.Router();
 const { check } = require("express-validator");
 
 const adminController = require("../controllers/admin");
 
-router.get("/add-product", isAuth, adminController.getAddProductPage);
+router.get("/add-product", authenticate, adminController.getAddProductPage);
 
 router.post(
   "/add-product",
+  authenticate,
   [
     check("title")
       .trim()
@@ -27,16 +28,20 @@ router.post(
       .trim()
       .isLength(5)
   ],
-  isAuth,
   adminController.postAddProductPage
 );
 
-router.get("/products", isAuth, adminController.getProductsPage);
+router.get("/products", authenticate, adminController.getProductsPage);
 
-router.get("/edit-product/:id", isAuth, adminController.getEditProductPage);
+router.get(
+  "/edit-product/:id",
+  authenticate,
+  adminController.getEditProductPage
+);
 
 router.post(
   "/edit-product",
+  authenticate,
   [
     check("title")
       .trim()
@@ -56,10 +61,14 @@ router.post(
       .trim()
       .isLength(5)
   ],
-  isAuth,
+
   adminController.postEditProductPage
 );
 
-router.post("/delete-product", isAuth, adminController.postDeleteProductPage);
+router.post(
+  "/delete-product",
+  authenticate,
+  adminController.postDeleteProductPage
+);
 
 module.exports = router;
