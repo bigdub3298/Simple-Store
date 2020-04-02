@@ -9,7 +9,7 @@
     <% if (['/admin/add-product', '/admin/edit-product', '/login', '/signup',
     '/reset'].includes(path)) { %>
     <link rel="stylesheet" href="/css/forms.css" />
-    <% } %> <% if (path === '/cart') { %>
+    <% } %> <% if (path === '/cart' || path === '/checkout') { %>
     <link rel="stylesheet" href="/css/cart.css" />
     <% } %><% if (path === '/orders') { %>
     <link rel="stylesheet" href="/css/orders.css" />
