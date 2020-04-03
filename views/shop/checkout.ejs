@@ -13,6 +13,14 @@ include('../includes/navigation.ejs')%>
   <div class="centered">
     <h2>Total: $<%= totalSum %></h2>
   </div>
+  <div class="centered">
+    <button id="order-btn" class="btn">ORDER</button>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+      const sessionId = "<%= sessionId %>";
+    </script>
+    <script src="/js/stripe.js"></script>
+  </div>
 </main>
 
 <%- include('../includes/end.ejs')%>

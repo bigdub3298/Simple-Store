@@ -1,4 +1,6 @@
+require("dotenv").config();
 const pdfDocument = require("pdfkit");
+const stripe = require("stripe")(process.env.STRIPE_TEST_SECRET_KEY);
 
 const Product = require("../models/product");
 const Order = require("../models/order");
@@ -180,7 +182,7 @@ exports.getOrdersPage = (req, res, next) => {
     });
 };
 
-exports.postOrdersPage = (req, res, next) => {
+exports.getCheckoutSuccess = (req, res, next) => {
   let currentCart;
 
   req.user
@@ -277,20 +279,39 @@ exports.getInvoice = (req, res, next) => {
 };
 
 exports.getCheckoutPage = (req, res, next) => {
+  let products, totalSum;
   req.user
     .getCart()
     .then(cart => cart.getProducts())
-    .then(products => {
-      const totalSum = products.reduce(
+    .then(prods => {
+      products = prods;
+      totalSum = products.reduce(
         (total, product) => total + product.price * product.cartItem.quantity,
         0
       );
 
+      return stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: products.map(product => {
+          return {
+            name: product.title,
+            description: product.description,
+            amount: product.price * 100,
+            currency: "usd",
+            quantity: product.cartItem.quantity
+          };
+        }),
+        success_url: `${req.protocol}://${req.get("host")}/checkout/success`,
+        cancel_url: `${req.protocol}://${req.get("host")}/checkout/cancel`
+      });
+    })
+    .then(session => {
       res.render("shop/checkout", {
         docTitle: "Checkout",
         path: "/checkout",
         products,
-        totalSum
+        totalSum,
+        sessionId: session.id
       });
     })
     .catch(err => {
